@@ -5,8 +5,17 @@ class ProductManager {
     constructor(path){
         this.path = path;
         this.contador = 0;
-        this.products = [];
-        this.writeProducts();  
+        this.products = this.ReadProducts();
+    }
+
+    ReadProducts() {
+        try {
+            const data = fs.readFileSync(this.path, 'utf8');
+            return JSON.parse(data);
+        } catch (error) {
+            console.error(`No se encontro ${this.path}:`);
+            return [];
+        }
     }
 
     writeProducts() {
