@@ -57,8 +57,6 @@ class ProductManager {
         }
 
         const existingProduct = this.products[productIndex];
-
-        
         Object.assign(existingProduct, updatedFields);
 
         console.log(`El producto con el ID ${id} se actualizó correctamente`);
@@ -82,62 +80,31 @@ class ProductManager {
 //testeos
 const productManager = new ProductManager('products.json');
 
+// muestro el array 
+const showEmptyArray = productManager.getProducts();
+console.log(showEmptyArray);
+
+//agrego un producto prueba
 productManager.addProduct({
-    title:`productito`, 
-    description:`muchas cositas`,
-    price: 35,
-    thumbnail:`productito.jpg`,
-    code: 43,
-    stock: 3,
+    title:`producto prueba`, 
+    description:`este es un producto prueba`,
+    price: 200,
+    thumbnail:`sinimagen.jpg`,
+    code: "abc123",
+    stock: 25,
 });
 
-productManager.addProduct({
-    title:`productazo`, 
-    description:`pocas cositas`,
-    price: 53,
-    thumbnail:`productazo.jpg`,
-    code: 34,
-    stock: 9,
-});
+//muestro el producto prueba
+const showNewProduct = productManager.getProductById(0);
+console.log(showNewProduct);
 
-productManager.addProduct({
-    title:`producteto`, 
-    description:`demasiadas cositas`,
-    price: 65,
-    thumbnail:`producteto.jpg`,
-    code: 34,
-    stock: 4,
-});
-productManager.addProduct({
-
-    description:`interminables cositas`,
-    price: 65,
-    thumbnail:`productisimo.jpg`,
-    code: 5454,
-    stock: 4,
-});
-
-
-
-const mostrandoProductos = productManager.getProducts();
-
-console.log(mostrandoProductos);
-
-const idProducto = productManager.getProductById(1);
-
-console.log(idProducto);
-
-const idProductoFaltante = productManager.getProductById(34);
-
-console.log(idProductoFaltante);
-
-const borrarProducto = productManager.deleteProduct(1);
-
-const encontrarBorrado = productManager.getProductById(1);
-
-
-const update = productManager.updateProduct(0, { title: 'requeteproducto', price: 2999, stock: 500 });
-
+//modifico el producto
+productManager.updateProduct(0, { title: 'prueba update', price: 2999, stock: 500 });
 const updatemostrado = productManager.getProductById(0);
-
 console.log(updatemostrado);
+
+//borro el producto prueba 
+productManager.deleteProduct(0);
+const showDeleteProduct = productManager.getProductById(0);
+console.log(showDeleteProduct);
+
