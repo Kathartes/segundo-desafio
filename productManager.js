@@ -4,7 +4,7 @@ class ProductManager {
     
     constructor(path){
         this.path = path;
-        this.contador = 0;
+        this.contador = 1;
         this.products = this.ReadProducts();
     }
 
@@ -17,6 +17,13 @@ class ProductManager {
             return [];
         }
     }
+
+    updateNextId() {
+        if (this.products.length > 0) {
+          const maxId = Math.max(...this.products.map(product => product.id));
+          this.contador = maxId + 1;
+        }
+      }
 
     writeProducts() {
         fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2), 'utf8');
@@ -69,7 +76,7 @@ class ProductManager {
             console.error(`No se encontro el producto`);
         }
 
-        this.products.splice(id, 1);
+        this.products.splice(findProduct, 1);
         console.log(`El producto se borro correctamente`)
         this.writeProducts()
         return findProduct;  
@@ -95,16 +102,15 @@ productManager.addProduct({
 });
 
 //muestro el producto prueba
-const showNewProduct = productManager.getProductById(0);
+const showNewProduct = productManager.getProductById(1);
 console.log(showNewProduct);
 
 //modifico el producto
-productManager.updateProduct(0, { title: 'prueba update', price: 2999, stock: 500 });
-const updatemostrado = productManager.getProductById(0);
+productManager.updateProduct(1, { title: 'prueba update', price: 2999, stock: 500 });
+const updatemostrado = productManager.getProductById(1);
 console.log(updatemostrado);
 
 //borro el producto prueba 
-productManager.deleteProduct(0);
-const showDeleteProduct = productManager.getProductById(0);
+productManager.deleteProduct(1);
+const showDeleteProduct = productManager.getProductById(1);
 console.log(showDeleteProduct);
-
