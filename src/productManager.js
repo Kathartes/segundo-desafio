@@ -33,7 +33,7 @@ class ProductManager {
             throw new Error(`Error al escribir en ${this.path}: ${error.message}`);
         }
     }      
-  // Función para crear un producto
+  // Función para crear producto
     async addProduct(product){
         if (!product.title || !product.description || !product.price || !product.thumbnail || !product.code ||  !product.stock){
             throw new Error(`Debe ingresar todos los campos`);
