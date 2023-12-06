@@ -1,0 +1,16 @@
+<section class="section">
+    <h1>Productos</h1>
+    {{#each products}}
+    <article class="article">
+        <h2>{{title}}</h2>
+        <img class="imagen" src="{{thumbnail}}" alt="thumbnail">
+        <p>{{description}}</p>
+        <p>{{price}}</p>
+        <p>{{stock}}</p>
+        <p>{{code}}</p>
+        <p>{{id}}</p>
+    </article>
+    {{/each}}
+</section>
+
+<script src="/socket.io/socket.io.js"></script>

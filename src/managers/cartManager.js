@@ -15,7 +15,7 @@ class CartManager {
       this.carts = JSON.parse(data);
       this.updateLastId();
     } catch (error) {
-      throw new Error(`No se encontró ${this.path}: ${error.message}`);
+      console.error('El archivo de carritos no existe');
     }
   }
 
