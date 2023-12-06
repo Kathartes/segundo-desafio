@@ -34,8 +34,8 @@ function addProduct() {
         const article = document.createElement('article');
         article.classList.add('article');
         article.innerHTML = `
-            <h2>${product.title}</h2>
             <img src="${product.thumbnail}" alt="thumbnail">
+            <h2>${product.title}</h2>
             <p>${product.description}</p>
             <p>${product.price}</p>
             <p>${product.stock}</p>

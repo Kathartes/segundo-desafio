@@ -1,16 +1,21 @@
 <section class="section">
     <h1>Productos</h1>
-    {{#each products}}
-    <article class="article">
-        <h2>{{title}}</h2>
-        <img class="imagen" src="{{thumbnail}}" alt="thumbnail">
-        <p>{{description}}</p>
-        <p>{{price}}</p>
-        <p>{{stock}}</p>
-        <p>{{code}}</p>
-        <p>{{id}}</p>
-    </article>
-    {{/each}}
+    <div class="product-container">
+        {{#each products}}
+        <article class="article">
+            <img class="imagen" src="{{thumbnail}}" alt="thumbnail">
+            
+            <h2>{{title}}</h2>
+            <p>{{description}}</p>
+            <div class="info-container">
+                <p>precio: ${{price}}</p>
+                <p>stock: {{stock}}</p>
+                <p>codigo: {{code}}</p>
+                <p>id: {{id}}</p>
+            </div>
+        </article>
+        {{/each}}
+    </div>
 </section>
 
 <script src="/socket.io/socket.io.js"></script>

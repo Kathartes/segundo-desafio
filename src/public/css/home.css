@@ -1,3 +1,28 @@
-h1 {
-    color: blue;
+
+.section {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.product-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    grid-gap: 20px; 
+    padding: 20px;
+}
+
+.article {
+    border: 1px solid #ccc;
+    padding: 20px;
+    text-align: start;
+}
+.info-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    
+}
+.img {
+    width: 100%;
 }
