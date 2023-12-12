@@ -6,8 +6,9 @@ const productsRouter = require('./routes/products.router.js');
 const cartsRouter = require('./routes/cart.router.js');
 const viewsRouter = require('./routes/views.router.js');
 const ProductManager = require('./managers/productsManager.js')
+
 const app = express();
-const PORT = 8080;
+const PORT = 8080 || process.env.PORT;
 
 const hbs = handlebar.create({extname: '.hbs', defaultLayout: 'main', layoutsDir: path.join(__dirname, 'views/layouts')});
 app.engine('.hbs', hbs.engine);
