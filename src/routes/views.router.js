@@ -4,18 +4,17 @@ const ProductDaoMongo = require('../daos/productManagerMongo')
 const MessageDaoMongo = require('../daos/messageManagerMongo')
 const router= Router();
 
-//Instancia compartida del ProductManager
-//const productManager = ProductManager.getInstance('./src/mock/productos.json');
+
 const productService = new ProductDaoMongo()
 const messageService = new MessageDaoMongo()
 
-//Ruta para home
+
 router.get('/', async (req, res) => {
     const products = await productService.getProducts();
     res.render('home', { title: 'Home', style: 'home.css', body: 'home', products });
 });
 
-// Ruta para realTimeProducts
+
 router.get('/realtimeproducts', async (req, res) => {
     const products =  await productService.getProducts();
     res.render('realTimeProducts', { title: 'Real-Time Products', style: 'realTimeProducts.css', body: 'realTimeProducts', products });

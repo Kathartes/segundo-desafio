@@ -18,7 +18,7 @@ class CartDaoMongo {
     
       async getCart(cartId) {
         try {
-          const cart = await this.model.findById(cartId).populate('products.productId', 'title price'); // Asegúrate de ajustar el nombre del campo ObjectId en tu modelo de productos
+          const cart = await this.model.findById(cartId).populate('products.productId', 'title price'); 
           if (!cart) {
             throw new Error('El carrito no fue encontrado.');
           }
