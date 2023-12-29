@@ -1,6 +1,7 @@
 const {Schema, model, Types} = require('mongoose');
+const moongosePaginate = require('mongoose-paginate-v2');
 
-const productsCollection = ' Products';
+const productsCollection = 'Products';
 
 const ProductsSchema = Schema({
     _id: {
@@ -40,6 +41,9 @@ const ProductsSchema = Schema({
         type: Array
     }
 })
+
+UserSchema.plugin(moongosePaginate)
+
 const productsModel = model(productsCollection, ProductsSchema)
 
 module.exports = {

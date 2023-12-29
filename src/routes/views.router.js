@@ -25,6 +25,14 @@ router.get('/chat', async (req, res) => {
     res.render('chat', { title: 'Chat', style: 'chat.css', body: 'chat', messages });
 });
 
+router.get('/products', async (req, res) => {
+    const products =  await productService.getProducts();
+    res.render('products', { title: 'Products', style: 'products.css', body: 'products', products });
+});
+router.get('/carts/:cid', async (req, res) => {
+    const cart =  await cartService.get();
+    res.render('cart', { title: 'Cart', style: 'cart.css', body: 'cart', messages });
+});
 
 
 module.exports = router;

@@ -7,7 +7,15 @@ const productsRouter = Router();
 
 const productService = new ProductDaoMongo()
 
-
+productsRouter.get('/', async (req, res) =>{
+    try {
+      const products = await productService.getProducts();
+      res.json({ products });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Internal Server Error');
+    }
+  });
 
 productsRouter.get('/', async (req, res) =>{
   try {

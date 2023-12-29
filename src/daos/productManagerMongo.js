@@ -45,7 +45,7 @@ class ProductDaoMongo {
 
     async getProducts() {
         try {
-            const products= await this.model.find();
+            const products= await this.model.paginate({});
             return products
           } catch (error) {
             console.error('Error al obtener los productos:', error.message);

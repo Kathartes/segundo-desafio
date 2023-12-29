@@ -9,6 +9,9 @@ const CartsSchema = Schema({
       }],
 })
 
+CartsSchema.pre('findOne', function (){
+    this.populate('products.product')
+})
 const cartsModel = model(cartsCollection, CartsSchema)
 
 module.exports = {
