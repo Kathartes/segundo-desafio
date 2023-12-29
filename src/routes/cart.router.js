@@ -39,7 +39,7 @@ cartsRouter.post('/:cid/product/:pid', async (req, res) => {
 
 
 
-// DELETE api/carts/:cid/products/:pid
+
 cartsRouter.delete('/:cid/products/:pid', async (req, res) => {
   try {
     const cartId = req.params.cid;
@@ -52,7 +52,7 @@ cartsRouter.delete('/:cid/products/:pid', async (req, res) => {
   }
 });
 
-// PUT api/carts/:cid
+
 cartsRouter.put('/:cid', async (req, res) => {
   try {
     const cartId = req.params.cid;
@@ -65,7 +65,7 @@ cartsRouter.put('/:cid', async (req, res) => {
   }
 });
 
-// PUT api/carts/:cid/products/:pid
+
 cartsRouter.put('/:cid/products/:pid', async (req, res) => {
   try {
     const cartId = req.params.cid;
@@ -79,7 +79,6 @@ cartsRouter.put('/:cid/products/:pid', async (req, res) => {
   }
 });
 
-// DELETE api/carts/:cid
 cartsRouter.delete('/:cid', async (req, res) => {
   try {
     const cartId = req.params.cid;

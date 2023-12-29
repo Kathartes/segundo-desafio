@@ -10,7 +10,7 @@ const CartsSchema = Schema({
 })
 
 CartsSchema.pre('findOne', function (){
-    this.populate('products.product')
+    this.populate('products.productId')
 })
 const cartsModel = model(cartsCollection, CartsSchema)
 

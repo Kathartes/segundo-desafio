@@ -2,12 +2,13 @@
 const { Router } = require('express');
 const ProductDaoMongo = require('../daos/productManagerMongo')
 const MessageDaoMongo = require('../daos/messageManagerMongo')
+const CartDaoMongo = require ('../daos/cartManagerMongo')
 const router= Router();
 
 
 const productService = new ProductDaoMongo()
 const messageService = new MessageDaoMongo()
-
+const cartService = new CartDaoMongo()
 
 router.get('/', async (req, res) => {
     const products = await productService.getProducts();
@@ -26,12 +27,14 @@ router.get('/chat', async (req, res) => {
 });
 
 router.get('/products', async (req, res) => {
-    const products =  await productService.getProducts();
+    const { limit, page, sort, query } = req.query;
+    const products =  await productService.getProducts({limit, page, sort, query});
     res.render('products', { title: 'Products', style: 'products.css', body: 'products', products });
 });
 router.get('/carts/:cid', async (req, res) => {
-    const cart =  await cartService.get();
-    res.render('cart', { title: 'Cart', style: 'cart.css', body: 'cart', messages });
+    const { cid } = req.params;
+    const cart =  await cartService.getCart({ _id: cid});
+    res.render('cart', { title: 'Cart', style: 'cart.css', body: 'cart', cart });
 });
 
 
