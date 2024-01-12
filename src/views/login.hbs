@@ -1,0 +1,18 @@
+
+<div class="container">
+    <input type="checkbox" id="check">
+    <div class="login form">
+      <header>Login</header>
+      <form action="/api/session/login" method="POST">
+        <input type="text" id="email" name="email" placeholder="Email">
+        <input type="password" id="password" name="password" placeholder="Password">
+        <a href="#">Olvidaste tu contraseña?</a>
+        <button type="submit" class="button" value="Login">login</button>
+      </form>
+      <div class="signup">
+        <span class="signup">No tienes una cuenta?
+         <label for="check"><a href="/register">Signup</a></label>
+        </span>
+      </div>
+    </div>
+</div>

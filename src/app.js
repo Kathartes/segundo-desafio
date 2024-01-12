@@ -5,10 +5,16 @@ const path = require('path');
 const productsRouter = require('./routes/products.router');
 const cartsRouter = require('./routes/cart.router');
 const viewsRouter = require('./routes/views.router');
+const sessionRouter = require('./routes/sessions.router')
 const { connectDB } = require('./config')
 const ProductDaoMongo = require('./daos/productManagerMongo');
 const MessageDaoMongo = require('./daos/messageManagerMongo');
 //const ProductManager = require('./managers/productManager');
+
+const session = require('express-session')
+const MongoStore = require('connect-mongo')
+
+const cookieParser = require('cookie-parser')
 
 const app = express();
 const port = 8080;
@@ -27,16 +33,32 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 
 
 
 //const productManager = ProductManager.getInstance('./src/mock/productos.json');
 
 
+
+//app.use('/api/cookie',)
+app.use(session({
+    store: MongoStore.create({
+      mongoUrl: 'mongodb+srv://aromerosambucetti:andres@cluster0.dmkux9o.mongodb.net/entregabase?retryWrites=true&w=majority',
+      ttl: 60*60,
+    }),
+    secret: 'secretCoder',
+    resave: true, 
+    saveUninitialized: true 
+}))
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/', viewsRouter);
+app.use('/api/session', sessionRouter);
 
+app.get('/', (req, res) => {
+  res.redirect('/login');
+})
 
 const serverHttp = app.listen(port, err => {
   if (err) console.log(err)

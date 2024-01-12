@@ -1,3 +1,10 @@
+<header>
+  <a href="/api/session/logout">Logout</a>
+  <p>bienvenido{{user.first_name}} {{user.last_name}}</p> 
+  {{#if user}}
+  <p><span>Rol:</span> {{user.role}}</p>
+  {{/if}}
+</header>
 <section class="section">
     <h1>Lista de Productos</h1>
 <ul class="products">

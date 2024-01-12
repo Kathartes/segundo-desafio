@@ -43,48 +43,14 @@ class ProductDaoMongo {
     }
 
 
-    async getProducts(limit, page, sort, query) {
+    async getProducts() {
         try {
-            const options = {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                sort: sort ? { price: sort === 'asc' ? 1 : -1 } : undefined,
-            };
-
-            let filter = {};
-
-            if (query) {
-         
-                const isStatus = query.toLowerCase() === 'true' || query.toLowerCase() === 'false';
-
-                if (isStatus) {
-                    filter.status = query.toLowerCase() === 'true';
-                } else {
-                   
-                    filter.category = query;
-                }
-            }
-
-            const result = await this.model.paginate(filter, options);
-
-            const response = {
-                status: 'success',
-                payload: result.docs,
-                totalPages: result.totalPages,
-                prevPage: result.prevPage,
-                nextPage: result.nextPage,
-                page: result.page,
-                hasPrevPage: result.hasPrevPage,
-                hasNextPage: result.hasNextPage,
-                prevLink: result.hasPrevPage ? `/products?limit=${limit}&page=${result.prevPage}`: null,
-                nextLink: result.hasNextPage ? `/products?limit=${limit}&page=${result.nextPage}`: null,
-            };
-
-            return response;
-        } catch (error) {
-            console.error('Error al obtener los productos paginados:', error.message);
+            const products= await this.model.find();
+            return products
+          } catch (error) {
+            console.error('Error al obtener los productos:', error.message);
             throw error;
-        }
+          }
     }
 
     async getProductsLimited(limit) {
