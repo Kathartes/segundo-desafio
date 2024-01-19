@@ -5,11 +5,11 @@ class UserDaoMongo {
         this.model = usersModel;
     }
 
-    getUserBy = async (filter) => await this.userModel.findOne(filter)
+    
 
-    async getUser(email, password) {
+    async getUser(filter) {
         try {
-            const user = await this.model.findOne({ email, password });
+            const user = await this.model.findOne( filter );
             return user;
         } catch (error) {
             throw new Error(`Error al obtener usuario: ${error.message}`);
@@ -31,6 +31,7 @@ class UserDaoMongo {
                 last_name: user.last_name,
                 email: user.email,
                 password: user.password,
+                role: user.role
             });
             return newUser;
 

@@ -23,11 +23,11 @@ sessionRouter.post('/login', async (req, res) => {
     }*/
     const user = await usersModel.findOne({email})
     if (!user) {
-      return res.send('email o contraseña')
+      return res.send('Usuario no existe')
     }
 
     if (!isValidPassword(password, {password: user.password})){
-      return res.send('email o contraseña equivocado ')
+      return res.send('contraseña equivocada')
     }
 
    
@@ -51,7 +51,7 @@ sessionRouter.get('/logout', async (req, res) => {
     });
 });
 
-
+/*
 sessionRouter.post('/register', async (req, res) => {
     const { first_name, last_name, email, password} = req.body;
  
@@ -75,5 +75,26 @@ sessionRouter.post('/register', async (req, res) => {
       res.send('Error al registrar usuario. Inténtalo de nuevo.');
     }
   });
+*/
+sessionRouter.post('/login', passport.authenticate('login', {failureRedirect: '/api/session/faillogin'}), async (req, res) => {
+  if(!req.user) return res.status(401).send({status: 'error', error: 'Invalid Credential'})
 
+  req.session.user = { first_name: req.user.first_name, last_name: req.user.last_name, email: req.user.email, role: req.user.role };
+  res.redirect('/products');
+})
+sessionRouter.get('/faillogin', (req, res) => {
+  console.log('Fail strategy')
+  res.send({status: 'error', error: 'Failed login'})
+})
+
+
+sessionRouter.post('/register', passport.authenticate('register', { 
+  failureRedirect: '/api/session/failregister'
+}), (req, res) => {
+  res.redirect('/login'); 
+});
+sessionRouter.get('/failregister', (req, res) => {
+  console.log('Fail strategy')
+  res.send({status: 'error', error: 'Failed'})
+})
   module.exports = sessionRouter;

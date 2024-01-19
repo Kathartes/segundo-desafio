@@ -14,6 +14,10 @@ const MessageDaoMongo = require('./daos/messageManagerMongo');
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
 
+const passport = require('passport')
+const { initializePassport } = require('./config/passport.config')
+
+ 
 const cookieParser = require('cookie-parser')
 
 const app = express();
@@ -51,6 +55,12 @@ app.use(session({
     resave: true, 
     saveUninitialized: true 
 }))
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
+
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/', viewsRouter);
@@ -59,6 +69,8 @@ app.use('/api/session', sessionRouter);
 app.get('/', (req, res) => {
   res.redirect('/login');
 })
+
+
 
 const serverHttp = app.listen(port, err => {
   if (err) console.log(err)
