@@ -5,6 +5,8 @@ class UserDaoMongo {
         this.model = usersModel;
     }
 
+    getUserBy = async (filter) => await this.userModel.findOne(filter)
+
     async getUser(email, password) {
         try {
             const user = await this.model.findOne({ email, password });
