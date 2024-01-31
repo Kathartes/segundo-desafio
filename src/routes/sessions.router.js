@@ -3,7 +3,21 @@ const UserDaoMongo = require('../daos/userManagerMongo.js');
 const { isValidPassword, createHash } = require('../utils/hashPassword.js');
 const sessionRouter= Router();
 const userService = new UserDaoMongo();
+const passport = require('passport');
+const { createToken } = require('../utils/jwt');
+const { passportCall } = require ('../utils/passportCall.js')
+const { authorizationJwt,  authenticationJwtCurrent  } = require('../middlewares/jwtPassport.middleware')
 
+sessionRouter.get('/current', passportCall('jwt'), authenticationJwtCurrent, (req, res) => {
+  res.send({ message: 'Datos del usuario actual', user: req.user });
+});
+
+sessionRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req, res) => {
+  //Borra la cookie del token
+  res.clearCookie('token');
+
+  res.status(200).json({ status: 'success', message: 'Logout successful' });
+});
 
 sessionRouter.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -12,16 +26,7 @@ sessionRouter.post('/login', async (req, res) => {
         return res.send('Complete todos los campos')
     }
 
-    /*if (email === 'adminCoder@coder.com' && password === 'adminCod3r123') {
-      req.session.user = { first_name: 'admin', email, role: 'admin' };
-      return res.redirect('/products'); 
-  }
-
-   /* const user = await userService.getUser(email, password)
-    if(!user){
-        return res.send('Email o Password invalidos')
-    }*/
-    const user = await usersModel.findOne({email})
+    const user = await userService.getUser({email})
     if (!user) {
       return res.send('Usuario no existe')
     }
@@ -32,11 +37,18 @@ sessionRouter.post('/login', async (req, res) => {
 
    
 
-    console.log(user);
-    req.session.user = { first_name: user.first_name, last_name: user.last_name, email, role: 'usuario' };
-    res.json('login success')
-  
-    res.redirect('/products');
+    console.log(user)
+    const token = createToken({id: user._id, first_name: user.first_name, last_name: user.last_name, email, cart: user.cart, role: user.role })
+    res.cookie('token', token,{
+        maxAge: 60 * 60 * 1000 * 24,
+        httpOnly: true,
+        // secure: true,
+        // sameSite: 'none'
+    }).json({
+        status: 'success',
+        message: 'logged in',
+        redirectUrl: '/products',
+    })
 });
 
 
@@ -51,32 +63,45 @@ sessionRouter.get('/logout', async (req, res) => {
     });
 });
 
-/*
+
 sessionRouter.post('/register', async (req, res) => {
-    const { first_name, last_name, email, password} = req.body;
+    const { first_name, last_name, email, password, age, role} = req.body;
  
     try {
       const newUser = {
         first_name,
         last_name,
         email,
-        password: createHash(password)
+        password: createHash(password),
+        age,
+        role
       }
     
       const result = await userService.createUser(newUser);
 
-      if (result.error) {
-        return res.send(result.error);
+    const token = createToken({ id: result._id })
+
+    if (result.error) {
+      return res.send(result.error);
     }
-  
-      res.redirect('/login');
-    } catch (error) {
-      console.error('Error al registrar usuario:', error.message);
-      res.send('Error al registrar usuario. Inténtalo de nuevo.');
-    }
+    res.cookie('token', token, {
+      maxAge: 60 * 60 * 1000 * 24,
+      httpOnly: true,
+      // secure: true,
+      // sameSite: 'none'
+    }).json({
+      status: 'success',
+      message: 'logged in',
+      redirectUrl: '/login',
+    })
+
+  } catch (error) {
+    console.error('Error al registrar usuario:', error.message);
+    res.send('Error al registrar usuario. Inténtalo de nuevo.');
+  }
   });
-*/
-sessionRouter.post('/login', passport.authenticate('login', {failureRedirect: '/api/session/faillogin'}), async (req, res) => {
+
+/*sessionRouter.post('/login', passport.authenticate('login', {failureRedirect: '/api/session/faillogin'}), async (req, res) => {
   if(!req.user) return res.status(401).send({status: 'error', error: 'Invalid Credential'})
 
   req.session.user = { first_name: req.user.first_name, last_name: req.user.last_name, email: req.user.email, role: req.user.role };
@@ -96,5 +121,5 @@ sessionRouter.post('/register', passport.authenticate('register', {
 sessionRouter.get('/failregister', (req, res) => {
   console.log('Fail strategy')
   res.send({status: 'error', error: 'Failed'})
-})
+})*/
   module.exports = sessionRouter;

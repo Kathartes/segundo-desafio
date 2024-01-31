@@ -46,7 +46,7 @@ app.use(cookieParser());
 
 
 //app.use('/api/cookie',)
-app.use(session({
+/*app.use(session({
     store: MongoStore.create({
       mongoUrl: 'mongodb+srv://aromerosambucetti:andres@cluster0.dmkux9o.mongodb.net/entregabase?retryWrites=true&w=majority',
       ttl: 60*60,
@@ -54,11 +54,11 @@ app.use(session({
     secret: 'secretCoder',
     resave: true, 
     saveUninitialized: true 
-}))
+}))*/
 
 initializePassport()
 app.use(passport.initialize())
-app.use(passport.session())
+
 
 
 app.use('/api/products', productsRouter);

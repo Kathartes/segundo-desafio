@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const usersCollection = "Users"
 
@@ -23,12 +23,24 @@ const usersSchema = Schema({
     type: String,
     required: true,
     trim: true
+  }, 
+  age: {
+    type: Number,
+    required: true,
+    trim: true
+  },
+  cart: {
+    cartId: { type: Types.ObjectId, ref: 'Carts'},
   },
   role: {
     type: String,
     required: true
   }
 })
+
+usersSchema.pre('findoOne', function(){
+  this.populate('cart.cartId')
+} )
 
 const usersModel = model(usersCollection, usersSchema)
 

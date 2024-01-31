@@ -1,4 +1,7 @@
+const CartDaoMongo = require('./cartManagerMongo');
 const { usersModel } = require('./models/user.model');
+
+const cartService = new CartDaoMongo
 
 class UserDaoMongo {
     constructor() {
@@ -31,7 +34,9 @@ class UserDaoMongo {
                 last_name: user.last_name,
                 email: user.email,
                 password: user.password,
-                role: user.role
+                age: user.age,
+                cart: { cartId: (await cartService.createCart())._id },
+                role: user.role,
             });
             return newUser;
 

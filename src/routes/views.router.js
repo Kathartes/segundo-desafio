@@ -4,6 +4,7 @@ const ProductDaoMongo = require('../daos/productManagerMongo')
 const MessageDaoMongo = require('../daos/messageManagerMongo')
 const CartDaoMongo = require ('../daos/cartManagerMongo')
 const router= Router();
+const jwt = require('jsonwebtoken')
 
 
 const productService = new ProductDaoMongo()
@@ -27,10 +28,20 @@ router.get('/chat', async (req, res) => {
 });
 
 router.get('/products', async (req, res) => {
-    const { limit, page, sort, query } = req.query;
-    const user = req.session.user;
-    const products =  await productService.getProducts({limit, page, sort, query});
-    res.render('products', { title: 'Products', style: 'products.css', body: 'products', products, user });
+    try {
+        const { limit, page, sort, query } = req.query;
+        const token = req.cookies.token;
+
+        if (!token) {
+            return res.redirect('/login'); 
+        }
+        const decodedToken = jwt.verify(token, 'CoderSecretJasonWebToken');
+        const result = await productService.getProductsLimited({ limit, page, sort, query });
+        res.render('products', { title: 'Products', style: 'products.css', body: 'products', products: result.payload, pagination: result, user: decodedToken });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
+    }
 });
 router.get('/carts/:cid', async (req, res) => {
     const { cid } = req.params;
