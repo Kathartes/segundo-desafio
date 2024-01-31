@@ -6,7 +6,7 @@ const userService = new UserDaoMongo();
 const passport = require('passport');
 const { createToken } = require('../utils/jwt');
 const { passportCall } = require ('../utils/passportCall.js')
-const { authorizationJwt,  authenticationJwtCurrent  } = require('../middlewares/jwtPassport.middleware')
+const { authenticationJwtCurrent  } = require('../middlewares/jwtPassport.middleware.js')
 
 sessionRouter.get('/current', passportCall('jwt'), authenticationJwtCurrent, (req, res) => {
   res.send({ message: 'Datos del usuario actual', user: req.user });

@@ -35,7 +35,7 @@ router.get('/products', async (req, res) => {
         if (!token) {
             return res.redirect('/login'); 
         }
-        const decodedToken = jwt.verify(token, 'CoderSecretJasonWebToken');
+        const decodedToken = jwt.verify(token, 'palabrasecretaparafirmareltoken');
         const result = await productService.getProductsLimited({ limit, page, sort, query });
         res.render('products', { title: 'Products', style: 'products.css', body: 'products', products: result.payload, pagination: result, user: decodedToken });
     } catch (error) {

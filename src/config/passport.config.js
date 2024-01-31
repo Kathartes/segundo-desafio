@@ -24,5 +24,15 @@ exports.initializePassport = () => {
             return done(error)
         }
     }))
+    passport.use('current', new JWTStrategy({
+        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
+        secretOrKey: JWT_PRIVATE_KEY,
+    }, async (jwt_payload, done) => {
+        try {
+            return done(null, jwt_payload);
+        } catch (error) {
+            return done(error);
+        }
+    }));
 } 
 
