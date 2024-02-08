@@ -6,10 +6,12 @@ const productsRouter = require('./routes/products.router');
 const cartsRouter = require('./routes/cart.router');
 const viewsRouter = require('./routes/views.router');
 const sessionRouter = require('./routes/sessions.router')
-const { connectDB } = require('./config')
+const { connectDB, configObject } = require('./config')
 const ProductDaoMongo = require('./daos/productManagerMongo');
 const MessageDaoMongo = require('./daos/messageManagerMongo');
 //const ProductManager = require('./managers/productManager');
+
+
 
 const session = require('express-session')
 const MongoStore = require('connect-mongo')
@@ -21,7 +23,7 @@ const { initializePassport } = require('./config/passport.config')
 const cookieParser = require('cookie-parser')
 
 const app = express();
-const port = 8080;
+const port = configObject.PORT;
 
 connectDB()
 

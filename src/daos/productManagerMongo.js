@@ -12,14 +12,13 @@ class ProductDaoMongo {
                 return null;
             }
 
-           
             const existingProduct = await this.model.findOne({ code: product.code });
             if (existingProduct) {
                 console.error('El campo "code" ya está en uso.');
                 return null;
             }
 
-           
+        
             const thumbnails = product.thumbnails || [];
 
 

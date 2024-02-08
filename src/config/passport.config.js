@@ -1,5 +1,6 @@
 const passport = require('passport')
 const passport_jwt = require('passport-jwt')
+const { configObject } = require('./index')
 
 const JWTStrategy = passport_jwt.Strategy
 const ExtractJWT  = passport_jwt.ExtractJwt
@@ -15,7 +16,7 @@ exports.initializePassport = () => {
 
     passport.use('jwt', new JWTStrategy({
         jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-        secretOrKey: 'palabrasecretaparafirmareltoken'
+        secretOrKey: configObject.jwt_secret_key
     }, async ( jwt_payload, done )=>{
         try {
             console.log('jwt_payload passport config: ', jwt_payload )
@@ -26,7 +27,7 @@ exports.initializePassport = () => {
     }))
     passport.use('current', new JWTStrategy({
         jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-        secretOrKey: JWT_PRIVATE_KEY,
+        secretOrKey: configObject.jwt_secret_key,
     }, async (jwt_payload, done) => {
         try {
             return done(null, jwt_payload);
