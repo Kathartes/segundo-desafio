@@ -1,20 +1,34 @@
 <h1>Chat</h1>
 
-    <div id="chat-container">
-        <div id="message-form">
-            <input type="text" id="user-input" placeholder="Tu Mail">
-            <input type="text" id="message-input" placeholder="Tu mensaje">
-            <button id="send-button">Enviar</button>
-        </div>
-        <ul id="message-list">
-           
-            {{#each messages}}
-                {{#each this.messages}}
-                    <li><strong>{{../user}}:</strong> {{message}}</li>
-                {{/each}}
-            {{/each}}
-        </ul>
+<div id="chat-container" data-user-email="{{user.email}}">
+    <p><strong>Usuario: </strong>{{user.first_name}}</p>
+    <p><strong>Email: </strong>{{user.email}}</p>
+    <button id="products-btn">Ir a Productos</button>
+    <div id="message-form">
+        <input type="text" id="message-input" placeholder="Tu mensaje">
+        <button id="send-button">Enviar</button>
     </div>
+    <ul id="message-list">
+        {{#each messages}}
+            {{#each this.messages}}
+                <li><strong>{{../user}}:</strong> {{this.message}}</li>
+            {{/each}}
+        {{/each}}
+    </ul>
+</div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/chat.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chat.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+ 
+  //Agregar evento al botón de productos
+  const productsButton = document.getElementById('products-btn');
+  if (productsButton) {
+    productsButton.addEventListener('click', function () {
+      window.location.href = '/products';
+    });
+  }
+});
+</script>
+

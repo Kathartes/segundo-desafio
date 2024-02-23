@@ -17,3 +17,36 @@
       </div>
   </div>
 </div>
+
+<script>
+document.getElementById('login').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const first_name = document.getElementById('first_name').value;
+    const last_name = document.getElementById('last_name').value;
+    const age = document.getElementById('age').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const role = document.querySelector('input[name="role"]:checked').value;
+
+    //Realiza la solicitud de registro al servidor
+    fetch('/api/session/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ first_name, last_name, age, email, password, confirmPassword, role }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+
+            window.location.href = data.redirectUrl;
+        } else {
+            console.error('Error:', data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+</script>

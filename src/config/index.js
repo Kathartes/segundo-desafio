@@ -19,6 +19,6 @@ exports.configObject = {
 
 exports.connectDB = async () => {
     await connect(process.env.MONGO_URI)
-    console.log('Base de datos conectada')
+    console.log('Conectado a la base de datos')
 }
 

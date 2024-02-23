@@ -1,49 +1,46 @@
-const CartDaoMongo = require('./cartManagerMongo');
-const { usersModel } = require('./models/user.model');
+const { usersModel } = require('./managers/mongo/models/user.model');
+const CartDaoMongo = require('./managers/mongo/cartManagerMongo')
 
-const cartService = new CartDaoMongo
+const cartService = new CartDaoMongo()
 
 class UserDaoMongo {
     constructor() {
         this.model = usersModel;
     }
 
+    //muestra todos los usuarios
+    async get() {
+        return await this.model.find();
+    }
+
+    // Muestra un usuario especifico segun un filtro
+    async getBy(filter) {
+        return await this.model.findOne(filter);
+    }
+
+    // Crea un usuario
+    async create(user) {
+        const cart = await cartService.create();
+        user.cart = cart._id;
+        return await this.model.create(user);
+    }
     
-
-    async getUser(filter) {
-        try {
-            const user = await this.model.findOne( filter );
-            return user;
-        } catch (error) {
-            throw new Error(`Error al obtener usuario: ${error.message}`);
-        }
+    //modifica usuario
+    async update(uid, updatedFields) {
+        return await this.model.findOneAndUpdate(
+            { _id: uid },
+            { $set: updatedFields },
+            { new: true }
+        );
     }
 
-    async createUser(user) {
-        try {
-            if (!user.first_name || !user.last_name || !user.email || !user.password) {
-                return { error: 'Todos los campos son obligatorios.' };
-            }
-            const existingUser = await this.model.findOne({ email: user.email });
-            if (existingUser) {
-                return { error: 'El usuario ya existe' };
-            }
-
-            const newUser = await this.model.create({
-                first_name: user.first_name,
-                last_name: user.last_name,
-                email: user.email,
-                password: user.password,
-                age: user.age,
-                cart: { cartId: (await cartService.createCart())._id },
-                role: user.role,
-            });
-            return newUser;
-
-        } catch (error) {
-            throw new Error(`Error al crear usuario: ${error.message}`);
-        }
+    //Eliminar usuario segun ID
+    async delete(uid) { 
+        return await this.model.findByIdAndDelete(uid);
     }
+      
+      
+      
 }
 
 module.exports = UserDaoMongo;

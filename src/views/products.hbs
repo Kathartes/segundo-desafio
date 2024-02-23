@@ -1,32 +1,325 @@
-<header>
-  <a href="/api/session/logout">Logout</a>
-  <p>bienvenido{{user.first_name}} {{user.last_name}}</p> 
-  {{#if user}}
-  <p><span>Rol:</span> {{user.role}}</p>
-  {{/if}}
-</header>
-<section class="section">
-    <h1>Lista de Productos</h1>
-<ul class="products">
-  {{#each products}}
-    <li class="product-card">
-      <strong>ID:</strong> {{_id}}<br>
-      <strong>Title:</strong> {{title}}<br>
-      <strong>Description:</strong> {{description}}<br>
-      <strong>Code:</strong> {{code}}<br>
-      <strong>Price:</strong> ${{price}}<br>
-      <strong>Status:</strong> {{status}}<br>
-      <strong>Stock:</strong> {{stock}}<br>
-      <strong>Category:</strong> {{category}}<br>
-      <strong>Thumbnails:</strong>
-      <ul class="thumbnails">
-        {{#each thumbnails}}
+{{#if user}}
+<div class="container">
+  <div class="product-container">
+    <h1>Bienvenido {{user.first_name}} {{user.last_name}}!</h1>
+    <p><span>Email:</span> <span class="user-email">{{user.email}}</span></p>
+
+    <p><span>Rol:</span> {{user.role}}</p>
+    <p><span>ID Carrito:</span> {{user.cart._id}}</p>
+    <button id="chat-btn">Ir a Chat</button>
+    <button id="logout-btn">Logout</button>
+
+    <h2>Lista de Productos</h2>
+    <ul class="products">
+      {{#each products}}
+      <li class="product-card">
+        <strong>ID:</strong> {{_id}}<br>
+        <strong>Title:</strong> {{title}}<br>
+        <strong>Description:</strong> {{description}}<br>
+        <strong>Code:</strong> {{code}}<br>
+        <strong>Price:</strong> ${{price}}<br>
+        <strong>Status:</strong> {{status}}<br>
+        <strong>Stock:</strong> {{stock}}<br>
+        <strong>Category:</strong> {{category}}<br>
+        <strong>Thumbnails:</strong>
+        <ul class="thumbnails">
+          {{#each thumbnails}}
           <li><img class="image" src="{{this}}" alt="Thumbnail"></li>
-        {{/each}}
-      </ul>
-    </li>
-  {{/each}}
-</ul>
-</section>
+          {{/each}}
+        </ul>
+
+        <label for="quantity-input-{{_id}}">Cantidad:</label>
+        <input type="number" id="quantity-input-{{_id}}" class="quantity-input" value="1" min="1">
+
+        <button class="add-to-cart-btn" data-product-id="{{_id}}" data-product-stock="{{stock}}"
+          data-cart-id="{{user.cart.cartId._id}}">Agregar al carrito</button>
+
+      </li>
+      {{/each}}
+    </ul>
+  </div>
+  <div class="cart" data-cart-id="{{user.cart._id}}">
+    <h2>Carrito</h2>
+    <p><strong>ID del carrito: </strong>{{user.cart._id}}</p>
+    <p id="total"><strong>Total a Pagar: </strong></p>
+    <ul>
+      {{#each user.cart.products}}
+
+      {{/each}}
+    </ul>
+
+    <button class="clear-cart-btn">Vaciar Carrito</button>
+    <button class="purchase-btn">Realizar Compra</button>
+  </div>
+  {{else}}
+  <p>Usuario no autenticado. Por favor, inicie sesión.</p>
+  {{/if}}
+</div>
+<!-- Paginación -->
+<div class="pagination">
+  {{#if pagination.hasPrevPage}}
+  <a href="{{pagination.prevLink}}">Anterior</a>
+  {{/if}}
+
+  <span>Página {{pagination.page}} de {{pagination.totalPages}}</span>
+
+  {{#if pagination.hasNextPage}}
+  <a href="{{pagination.nextLink}}">Siguiente</a>
+  {{/if}}
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    const chatButton = document.getElementById('chat-btn');
+    if (chatButton) {
+      chatButton.addEventListener('click', function () {
+        window.location.href = '/chat';
+      });
+    }
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', function () {
+    fetch('/api/session/logout', {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then(response => {
+        if (response.ok) {
+          window.location.href = '/login';
+        } else {
+          console.error('Error en el logout:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Error en el logout:', error));
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    const clearCartButton = document.querySelector('.clear-cart-btn');
+    const cartElement = document.querySelector('.cart');
+    const cartId = cartElement.dataset.cartId;
+    const totalAmountDisplay = document.createElement('p');
+
+
+    cartElement.appendChild(totalAmountDisplay);
+
+    //Cargar el carrito al entrar
+    fetch(`/api/carts/${cartId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+
+        renderCart(data.cart);
+      }).catch(error => {
+        console.error('Error en la solicitud de obtener el carrito:', error);
+      });
+
+
+    addToCartButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        const productId = this.getAttribute('data-product-id');
+        const cartId = cartElement.dataset.cartId;
+
+        const quantityInput = document.getElementById(`quantity-input-${productId}`);
+        const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
+
+        const productStock = parseInt(this.getAttribute('data-product-stock'));
+
+        //Verifica si la cantidad ingresada es mayor que el stock disponible
+        //if (quantity > productStock) {
+        //   alert('No hay suficiente stock disponible para agregar esta cantidad al carrito.');
+        //  return;
+        // }
+
+        addToCart(productId, cartId, quantity);
+      });
+    });
+
+    clearCartButton.addEventListener('click', function () {
+      clearCart(cartId);
+    });
+
+    //Agrega producto al carrito
+    async function addToCart(productId, cartId, quantity) {
+      try {
+        console.log('Add to cart clicked for product ID:', productId, cartId);
+
+
+
+        const addToCartResponse = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ quantity }),
+        });
+        const addToCartData = await addToCartResponse.json();
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const updatedCartResponse = await fetch(`/api/carts/${cartId}`);
+        const updatedCartData = await updatedCartResponse.json();
+
+        renderCart(updatedCartData.cart);
+      } catch (error) {
+        console.error('Error al agregar al carrito:', error);
+      }
+    }
+
+
+
+
+    //Elimina todos los productos del carrito
+    function clearCart(cartId) {
+      fetch(`/api/carts/${cartId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+        .then(response => response.json())
+        .then(data => {
+          renderCart(data.cart);
+        })
+        .catch(error => console.error('Error al vaciar el carrito:', error));
+    }
+
+
+    function renderCart(cart) {
+      let totalPrice = 0;
+      const cartList = document.querySelector('.cart ul');
+      const totalAmountDisplay = document.getElementById('total');
+
+      cartList.innerHTML = '';
+
+
+      if (cart && cart.products) {
+
+        cart.products.forEach(product => {
+          const listItem = document.createElement('li');
+
+          const productIdParagraph = document.createElement('p');
+          productIdParagraph.innerHTML = `<strong>ID: </strong>${product.productId._id}`;
+          listItem.appendChild(productIdParagraph);
+
+          const productTitleParagraph = document.createElement('p');
+          productTitleParagraph.innerHTML = `<strong>Producto: </strong>${product.productId.title}`;
+          listItem.appendChild(productTitleParagraph);
+
+          const thumbnailsContainer = document.createElement('div');
+          thumbnailsContainer.innerHTML = `<strong>Thumbnails:</strong><ul class="thumbnails">${product.productId.thumbnails.map(thumbnail => `<li><img class="image" src="${thumbnail}" alt="Thumbnail"></li>`).join('')}</ul>`;
+          listItem.appendChild(thumbnailsContainer);
+
+          const productDescriptionParagraph = document.createElement('p');
+          productDescriptionParagraph.innerHTML = `<strong>Descripción: </strong>${product.productId.description}`;
+          listItem.appendChild(productDescriptionParagraph);
+
+          const productCodeParagraph = document.createElement('p');
+          productCodeParagraph.innerHTML = `<strong>Código: </strong>${product.productId.code}`;
+          listItem.appendChild(productCodeParagraph);
+
+          const productCategoryParagraph = document.createElement('p');
+          productCategoryParagraph.innerHTML = `<strong>Categoría: </strong>${product.productId.category}`;
+          listItem.appendChild(productCategoryParagraph);
+
+          const productPriceParagraph = document.createElement('p');
+          productPriceParagraph.innerHTML = `<strong>Precio unitario: </strong>$${product.productId.price}`;
+          listItem.appendChild(productPriceParagraph);
+
+          const quantityParagraph = document.createElement('p');
+          quantityParagraph.innerHTML = `<strong>Cantidad: </strong>${product.quantity}`;
+          listItem.appendChild(quantityParagraph);
+
+          const removeButton = document.createElement('button');
+          removeButton.classList.add('remove-from-cart-btn');
+          removeButton.setAttribute('data-product-id', product.productId._id);
+          removeButton.innerHTML = 'Eliminar del carrito';
+          removeButton.addEventListener('click', function () {
+            const productId = this.getAttribute('data-product-id');
+            removeFromCart(productId);
+          });
+
+          const productPrice = parseFloat(product.productId.price);
+
+          //Calcula el precio total del producto
+          const productTotalPrice = productPrice * product.quantity;
+
+          //Suma el precio total del producto al precio total del carrito
+          totalPrice += productTotalPrice;
+
+
+          cartList.appendChild(listItem);
+          listItem.appendChild(removeButton);
+        });
+      }
+
+
+      totalAmountDisplay.textContent = `Total a Pagar: $${totalPrice.toFixed(2)}`;
+    }
+
+
+    //Elimina un producto del carrito
+    function removeFromCart(productId) {
+      const cartId = document.querySelector('.cart').dataset.cartId;
+
+      fetch(`/api/carts/${cartId}/products/${productId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+        .then(response => response.json())
+        .then(data => {
+          //Despues de eliminar, obtiene la información actualizada del carrito
+          fetch(`/api/carts/${cartId}`)
+            .then(response => response.json())
+            .then(data => {
+
+              renderCart(data.cart);
+            })
+            .catch(error => console.error('Error al obtener el carrito actualizado:', error));
+        })
+        .catch(error => console.error('Error al eliminar del carrito:', error));
+    }
+
+
+    const purchaseButton = document.querySelector('.purchase-btn');
+    if (purchaseButton) {
+      purchaseButton.addEventListener('click', function () {
+        const cartId = document.querySelector('.cart').dataset.cartId;
+        purchaseCart(cartId);
+      });
+    }
+
+    // Función para realizar la compra del carrito
+    async function purchaseCart(cartId) {
+    try {
+        const response = await fetch(`/api/carts/${cartId}/purchase`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            alert(`Compra realizada con éxito`);
+            setTimeout(() => {
+                location.reload();
+            }, 500); 
+        } else {
+            const errorData = await response.json();
+            alert('Algunos productos no pudieron ser comprados');
+            console.error('Error al realizar la compra:', errorData);
+        }
+    } catch (error) {
+        console.error('Error al realizar la compra:', error);
+        alert('Error al realizar la compra. Por favor, intenta de nuevo.');
+    }
+}
+
+
+
+  });
+</script>

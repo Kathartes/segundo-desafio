@@ -1,4 +1,4 @@
-const productDaoMongo = require('../daos/productManagerMongo')
+const productDaoMongo = require('../daos/managers/mongo/productManagerMongo')
 
 class ProductController{
     constructor(){

@@ -31,26 +31,35 @@
                 },
                 body: JSON.stringify({ email, password }),
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    
-                    window.location.href = '/products';
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('Información del usuario actual:', data);
 
-                    
-                    fetch('/api/session/current', {
-                        method: 'GET',
-                        credentials: 'include',
-                    })
-                    .then(response => response.json())
-                    .then(userData => {
-                        console.log('Información del usuario actual:', userData);
-                    })
-                    .catch(error => console.error('Error al obtener la información del usuario actual:', error));
-                } else {
-                    console.error('Error:', data.error);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+
+                        fetch('http://localhost:8080/api/session/current', {
+                            method: 'GET',
+                            credentials: 'include',
+                        })
+                            .then(response => response.json())
+                            .then(userData => {
+                                console.log('Información del usuario actual:', userData);
+                                if (userData && userData.user && userData.user.role) {
+                                    if (userData.user.role === 'user') {
+                                        window.location.href = '/products'; //Redirige a /products si el usuario es un usuario normal
+                                    } else if (userData.user.role === 'admin') {
+                                        window.location.href = '/manager'; //Redirige a /manager si el usuario es un administrador
+                                    }
+                                } else {
+                                    console.error('No se pudo obtener la información del usuario actual');
+                                }
+                            })
+                            .catch(error => console.error('Error al obtener la información del usuario actual:', error));
+
+                    } else {
+                        console.error('Error:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         });
     </script>
