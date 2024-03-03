@@ -10,6 +10,7 @@ const appRouter = require('./routes/index')
 const passport = require('passport')
 const { initializePassport } = require('./config/passport.config')
 const io = require('./helpers/serverIO')
+const { handleError } = require('./middlewares/error/handleError');
 
 const app = express();
 const port = configObject.PORT;

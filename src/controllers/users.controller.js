@@ -2,6 +2,9 @@ const { userService } = require('../repositories/services')
 const { createHash, isValidPassword } = require('../utils/hashPassword')
 const { createToken } = require('../utils/jwt');
 const { sendMail } = require('../utils/sendMail')
+const { EErrors } = require('../services/errors/enums');
+const { generatePurchaseCartErrorInfo } = require('../services/errors/errorGenerator');
+const CustomError = require('../services/errors/CustomError')
 
 
 class UserController {
@@ -63,7 +66,15 @@ class UserController {
 
   userRegister = async (req, res) => {
     const { first_name, last_name, email, password, confirmPassword, age, role } = req.body;
-
+    
+    if(!first_name || !last_name || !email || !age){
+      CustomError.createError({
+        name: 'User creation error',
+        cause: generateUserErrorInfo({first_name, last_name, email, age}),
+        message: 'Error trying to register user',
+        code: EErrors.INVALID_TYPES_ERROR
+      })
+    }
     const existingUser = await this.userService.getUser({ email });
     if (existingUser) {
       console.error('Ese Email ya esta en uso.');

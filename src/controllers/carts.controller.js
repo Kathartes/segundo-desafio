@@ -5,6 +5,11 @@ const UserDaoMongo = require('../daos/mongo/userManagerMongo')
 const { generateUniqueCode, calculateTotalAmount } = require('../helpers/cartHelper')
 
 const { cartService, ticketService, productService, userService } = require('../repositories/services')
+const { EErrors } = require('../services/errors/enums');
+const { generatePurchaseCartErrorInfo } = require('../services/errors/errorGenerator');
+const CustomError = require('../services/errors/CustomError')
+
+
 //const productService = new ProductDaoMongo()
 
 class CartController {
@@ -141,7 +146,12 @@ class CartController {
                     return res.status(404).json({ message: `Producto ${productData.productId} no encontrado` });
                 }
                 if (product.stock === 0) {
-                    return res.status(400).json({ message: `No hay stock disponible para el producto ${product.name}` });
+                    CustomError.createError({
+                        name: 'Product Stock error',
+                        cause: generatePurchaseCartErrorInfo(product.title, product.stock, productData.quantity),
+                        message: 'Error trying to purchase a product',
+                        code: EErrors.CART_OPERATION_ERROR
+                      })
                 }
                 const purchaseQuantity = Math.min(product.stock, productData.quantity);
                 product.stock -= purchaseQuantity;

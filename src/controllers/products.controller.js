@@ -1,4 +1,7 @@
 const productDaoMongo = require('../daos/managers/mongo/productManagerMongo')
+const { EErrors } = require('../services/errors/enums');
+const { generatePurchaseCartErrorInfo } = require('../services/errors/errorGenerator');
+const CustomError = require('../services/errors/CustomError')
 
 class ProductController{
     constructor(){
@@ -66,10 +69,14 @@ class ProductController{
             // Realiza las validaciones y manejo de errores aquí antes de llamar a addProduct en el service.
             const { title, description, price, code, stock, category, thumbnails } = req.body;
     
-            if (!title || !description || !price || !code || !stock || !category) {
-                console.error('Todos los campos son obligatorios.');
-                return res.status(400).send('Bad Request');
-            }
+            if(!title || !description || !price || !code || !stock || !category){
+                CustomError.createError({
+                  name: 'Product creation error',
+                  cause: generateProductErrorInfo({title, description, price, code, stock, category}),
+                  message: 'Error trying to create product',
+                  code: EErrors.INVALID_TYPES_ERROR
+                })
+              }
     
             const existingProduct = await this.productService.checkExistingProduct(code);
     
