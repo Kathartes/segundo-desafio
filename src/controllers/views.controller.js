@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { configObject } = require('../config/index')
 
 const { productService, messageService, cartService } = require('../repositories/services')
+const { logger } = require("../utils/logger")
 
 
 
@@ -102,7 +103,7 @@ class ViewsController {
 
             res.render('products', { title: 'Products', style: 'products.css', body: 'products', products: response.payload, pagination: response, user: decodedToken });
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(500).send('Internal Server Error');
         }
     }
@@ -125,7 +126,7 @@ class ViewsController {
             const cart = await this.cartService.getCart({ _id: cid });
             res.render('carts', { title: 'Cart', style: 'carts.css', body: 'carts', cart });
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(404).send('Cart Not Found');
         }
     }

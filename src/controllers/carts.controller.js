@@ -8,7 +8,7 @@ const { cartService, ticketService, productService, userService } = require('../
 const { EErrors } = require('../services/errors/enums');
 const { generatePurchaseCartErrorInfo } = require('../services/errors/errorGenerator');
 const CustomError = require('../services/errors/CustomError')
-
+const { logger } = require('../utils/logger')
 
 //const productService = new ProductDaoMongo()
 
@@ -25,7 +25,7 @@ class CartController {
             const newCart = await this.cartService.createCart();
             res.json({ cart: newCart });//res.send({status: 'success', payload: newCart})
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(500).send('Internal Server Error');
         }
     }
@@ -37,7 +37,7 @@ class CartController {
             const cart = await this.cartService.getCart({ _id: cid });
             res.json({ cart });//res.send({status: 'success', payload: cart})
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(404).send('Cart Not Found');
         }
     }
@@ -70,7 +70,7 @@ class CartController {
             const updatedCart = await this.cartService.getCart(cartId);
             res.json({ cart: updatedCart });
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(400).send('Bad Request');
         }
     }
@@ -84,7 +84,7 @@ class CartController {
 
             res.json({ cart: updatedCart });
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(400).send('Bad Request');
         }
     }
@@ -96,7 +96,7 @@ class CartController {
             const updatedCart = await this.cartService.updateCart(cartId, products);
             res.json({ cart: updatedCart });
         } catch (error) {
-            console.error(error.message);
+           logger.error(error.message);
             res.status(400).send('Bad Request');
         }
     }
@@ -109,7 +109,7 @@ class CartController {
             const updatedCart = await this.cartService.updateProductQuantity(cartId, productId, quantity);
             res.json({ cart: updatedCart });
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(400).send('Bad Request');
         }
     }
@@ -120,7 +120,7 @@ class CartController {
             const updatedCart = await this.cartService.removeAllProducts(cartId);
             res.json({ cart: updatedCart });
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(400).send('Bad Request');
         }
     }  
@@ -150,7 +150,7 @@ class CartController {
                         name: 'Product Stock error',
                         cause: generatePurchaseCartErrorInfo(product.title, product.stock, productData.quantity),
                         message: 'Error trying to purchase a product',
-                        code: EErrors.CART_OPERATION_ERROR
+                        code: EErrors.OPERATION_ERROR
                       })
                 }
                 const purchaseQuantity = Math.min(product.stock, productData.quantity);
@@ -181,7 +181,7 @@ class CartController {
                 return res.status(200).json({ message: 'Compra finalizada con éxito', ticket });
             }
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             return res.status(500).json({ message: 'Error en el servidor' });
         }
     }

@@ -2,6 +2,7 @@ const productDaoMongo = require('../daos/managers/mongo/productManagerMongo')
 const { EErrors } = require('../services/errors/enums');
 const { generatePurchaseCartErrorInfo } = require('../services/errors/errorGenerator');
 const CustomError = require('../services/errors/CustomError')
+const { logger } = require('../utils/logger')
 
 class ProductController{
     constructor(){
@@ -46,7 +47,7 @@ class ProductController{
     
             res.json(response);
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(500).send('Internal Server Error');
         }
     }
@@ -59,7 +60,7 @@ class ProductController{
             const product = await this.productService.getProductById(productId);
             res.json({ product });//res.send({status: 'success', payload: product})
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(404).send('Product Not Found');
         }
     }
@@ -81,7 +82,7 @@ class ProductController{
             const existingProduct = await this.productService.checkExistingProduct(code);
     
             if (existingProduct) {
-                console.error('El campo "code" ya está en uso.');
+                logger.error('El campo "code" ya está en uso.');
                 return res.status(400).send('Bad Request');
             }
     
@@ -96,7 +97,7 @@ class ProductController{
     
             res.json({ product: newProduct });
         } catch (error) {
-            console.error(error.message);
+            logger.error(error.message);
             res.status(400).send('Bad Request');
         }
     }

@@ -11,6 +11,7 @@ const passport = require('passport')
 const { initializePassport } = require('./config/passport.config')
 const io = require('./helpers/serverIO')
 const { handleError } = require('./middlewares/error/handleError');
+const { addLogger, logger } = require('./utils/logger')
 
 const app = express();
 const port = configObject.PORT;
@@ -40,12 +41,17 @@ app.use(passport.initialize())
 
 
 app.use(appRouter)
+app.use(handleError)
+app.use(addLogger)
 
+app.get('/', (req,res) => {
+  res.send({message: "prueba de logger"})
+})
 
 const serverHttp = app.listen(port, err => {
   if (err) console.log(err)
-  console.log(`Escuchando en el puerto ${port}`)
+  logger.info(`Escuchando en el puerto ${port}`)
 })
 io(serverHttp)
 //const io = new Server(serverHttp);
-console.log(`Socket.io server listening on port ${port}`);
+logger.info(`Socket.io server listening on port ${port}`);

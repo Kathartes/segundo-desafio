@@ -22,3 +22,4 @@ exports.connectDB = async () => {
     console.log('Conectado a la base de datos')
 }
 
+exports.mode == mode
