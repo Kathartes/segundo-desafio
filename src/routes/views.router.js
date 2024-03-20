@@ -31,5 +31,10 @@ router.get('/manager', handlePolicies(['ADMIN']), viewsController.manager);
 //Ruta para el carrito
 router.get('/carts/:cid', handlePolicies(['USER']), viewsController.cart);
 
+//Ruta para recuperar el carrito
+router.get('/recover', handlePolicies(['PUBLIC']), viewsController.recover);
+
+//Ruta para recuperacion del carrito
+router.get('/passrecovery/:token', handlePolicies(['PUBLIC']), viewsController.passRecovery);
 
 module.exports = router;
